@@ -19,10 +19,8 @@ import org.junit.Test;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static com.template.flows.CommonFlowTest.commonElementsInVault;
 import static com.template.flows.CommonFlowTest.commonTransferChecks;
 import static org.junit.jupiter.api.Assertions.*;
 

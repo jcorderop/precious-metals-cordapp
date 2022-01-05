@@ -2,10 +2,12 @@ package com.template.flows;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.template.contracts.PreciousMetalCommands;
+import com.template.contracts.PreciousMetalContract;
 import com.template.model.PreciousMetal;
 import com.template.states.PreciousMetalState;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndRef;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.node.services.Vault;
@@ -18,7 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.template.flows.SearchFlow.getStates;
@@ -115,8 +119,8 @@ public class PreciousMetalTransferFlow {
             // Add the iou as an output state, as well as a command to the transaction builder.
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             final TransactionBuilder builder = new TransactionBuilder(notary)
+                    .addOutputState(output, PreciousMetalContract.CONTRACT_ID)
                     .addInputState(pmStateAndRef)
-                    .addOutputState(output)
                     .addCommand(command);
 
             // Step 4. Verify and sign it with our KeyPair.
@@ -140,7 +144,7 @@ public class PreciousMetalTransferFlow {
             return subFlow(new FinalityFlow(stx, sessions));
         }
 
-        private StateAndRef<PreciousMetalState> getPreciousMetalStateStateAndRef(PreciousMetal pmToTransfer) {
+        private StateAndRef<PreciousMetalState> getPreciousMetalStateStateAndRef(PreciousMetal pmToTransfer) throws FlowException {
             //https://docs.r3.com/en/tutorials/corda/4.8/os/build-basic-cordapp/basic-cordapp-flows.html
             //TODO Query criteria is not working as expected
             final List<StateAndRef<PreciousMetalState>> states = getServiceHub()
@@ -165,7 +169,7 @@ public class PreciousMetalTransferFlow {
                             .getPreciousMetal()
                             .equals(pmToTransfer))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Has NO assets to transfer..."));
+                    .orElseThrow(() -> new FlowException("Has NO assets to transfer..."));
         }
     }
 

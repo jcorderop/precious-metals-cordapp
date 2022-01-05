@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PreciousMetalTransferFlowTests {
 
-    private final Logger logger = LoggerFactory.getLogger(PreciousMetalTransferFlowTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(PreciousMetalTransferFlowTests.class);
     
     private MockNetwork network;
     private StartedMockNode issuer;
@@ -63,7 +63,9 @@ public class PreciousMetalTransferFlowTests {
         //when
         //Transfer from issuer to a bank
         final Party partyOwner =  cantonalBank.getInfo().getLegalIdentities().get(0);
-        SignedTransaction signedTransactionToBank = trasnferToBank(issuer, partyOwner);
+        SignedTransaction signedTransactionToBank = trasnferToBank(issuer,
+                partyOwner,
+                network);
 
         assertEquals(1, commonElementsInVault(issuer));
         assertEquals(0, commonElementsInVault(swissBank));
@@ -75,7 +77,9 @@ public class PreciousMetalTransferFlowTests {
 
         //Transfer from bank to a bank
         final Party partySecondOwner =  swissBank.getInfo().getLegalIdentities().get(0);
-        SignedTransaction signedTransactionToSecondBank = trasnferToBank(cantonalBank, partySecondOwner);
+        SignedTransaction signedTransactionToSecondBank = trasnferToBank(cantonalBank,
+                partySecondOwner,
+                network);
 
         //then
 
@@ -99,7 +103,9 @@ public class PreciousMetalTransferFlowTests {
         //when
         //Transfer to a bank
         final Party owner =  cantonalBank.getInfo().getLegalIdentities().get(0);
-        SignedTransaction signedTransactionToBank = trasnferToBank(issuer, owner);
+        SignedTransaction signedTransactionToBank = trasnferToBank(issuer,
+                owner,
+                network);
 
         //then
         testInputsAndOutputs(signedTransactionToBank);
@@ -113,7 +119,9 @@ public class PreciousMetalTransferFlowTests {
         commonTransferChecks(signedTransactionToBank, owner, cantonalBank);
     }
 
-    private SignedTransaction trasnferToBank(StartedMockNode nodeStarted, Party owner) throws InterruptedException, ExecutionException {
+    public static SignedTransaction trasnferToBank(StartedMockNode nodeStarted,
+                                                   Party owner,
+                                                   MockNetwork network) throws InterruptedException, ExecutionException {
         PreciousMetalTransferFlow.PreciousMetalTransferFlowInitiator pmTransferFlowInitiator =
                 new PreciousMetalTransferFlow
                         .PreciousMetalTransferFlowInitiator(MetalNames.GOLD_BAR.getMetalName(),

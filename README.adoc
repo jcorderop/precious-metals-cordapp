@@ -13,8 +13,8 @@ image::docs/diagram.PNG[]
 
 * The state is the precious metals itself
 * The definition is by
-    - Type that can be gold, solver
-    - Units that can be in kg, g, oz
+    - Type that can be Gold Bar, Gold Coin, Silver Bar, Silver Coin
+    - Units that can be in K, g, oz
     - and Weight
 
 == Contract

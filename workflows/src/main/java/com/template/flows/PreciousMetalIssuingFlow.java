@@ -10,6 +10,7 @@ import net.corda.core.identity.Party;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,12 @@ public class PreciousMetalIssuingFlow {
             this.metalName = metalName;
             this.unit = unit;
             this.weight = weight;
+        }
+
+        @Nullable
+        @Override
+        public ProgressTracker getProgressTracker() {
+            return progressTracker;
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.template.flows;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.template.contracts.PreciousMetalCommands;
+import com.template.contracts.PreciousMetalContract;
 import com.template.states.PreciousMetalState;
 import net.corda.core.contracts.Command;
 import net.corda.core.flows.*;
@@ -24,13 +25,13 @@ public class PreciousMetalIssuingFlow {
     @StartableByRPC
     public static class PreciousMetalIssuingFlowInitiator extends FlowLogic<SignedTransaction>{
 
-        private final ProgressTracker.Step INITIALIZATION = new ProgressTracker.Step("Initialization");
-        private final ProgressTracker.Step RETRIEVING_NOTARY = new ProgressTracker.Step("Retrieving the Notary");
-        private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Generating transaction");
-        private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Verifying Transaction");
-        private final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step("Signing transaction with its private key");
-        private final ProgressTracker.Step COUNTERPARTY_SESSION = new ProgressTracker.Step("Sending flow to counterparty");
-        private final ProgressTracker.Step FINALIZING_TRANSACTION = new ProgressTracker.Step("Obtaining Notary signature and recording transaction");
+        private final ProgressTracker.Step INITIALIZATION = new ProgressTracker.Step("Step 1. Initialization");
+        private final ProgressTracker.Step RETRIEVING_NOTARY = new ProgressTracker.Step("Step 2. Retrieving the Notary");
+        private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Step 3. Generating transaction");
+        private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Step 4. Verifying Transaction");
+        private final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step("Step 5. Signing transaction with its private key");
+        private final ProgressTracker.Step COUNTERPARTY_SESSION = new ProgressTracker.Step("Step 6. Sending flow to counterparty");
+        private final ProgressTracker.Step FINALIZING_TRANSACTION = new ProgressTracker.Step("Step 7. Obtaining Notary signature and recording transaction");
 
         private final ProgressTracker progressTracker = new ProgressTracker(
                 INITIALIZATION,
@@ -91,7 +92,7 @@ public class PreciousMetalIssuingFlow {
             // Add the iou as an output state, as well as a command to the transaction builder.
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             final TransactionBuilder builder = new TransactionBuilder(notary)
-                    .addOutputState(output)
+                    .addOutputState(output, PreciousMetalContract.CONTRACT_ID)
                     .addCommand(command);
 
             // Step 4. Verify and sign it with our KeyPair.

@@ -7,11 +7,9 @@ import com.template.model.PreciousMetal;
 import com.template.states.PreciousMetalState;
 import net.corda.core.contracts.Command;
 import net.corda.core.contracts.StateAndRef;
-import net.corda.core.crypto.SecureHash;
 import net.corda.core.flows.*;
 import net.corda.core.identity.Party;
 import net.corda.core.node.services.Vault;
-import net.corda.core.node.services.vault.QueryCriteria;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.utilities.ProgressTracker;
@@ -20,9 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.template.flows.SearchFlow.getStates;
@@ -36,13 +32,13 @@ public class PreciousMetalTransferFlow {
     @StartableByRPC
     public static class PreciousMetalTransferFlowInitiator extends FlowLogic<SignedTransaction>{
 
-        private final ProgressTracker.Step INITIALIZATION = new ProgressTracker.Step("Initialization");
-        private final ProgressTracker.Step RETRIEVING_NOTARY = new ProgressTracker.Step("Retrieving the Notary");
-        private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Generating transaction");
-        private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Verifying Transaction");
-        private final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step("Signing transaction with its private key");
-        private final ProgressTracker.Step COUNTERPARTY_SESSION = new ProgressTracker.Step("Sending flow to counterparty");
-        private final ProgressTracker.Step FINALIZING_TRANSACTION = new ProgressTracker.Step("Obtaining Notary signature and recording transaction");
+        private final ProgressTracker.Step INITIALIZATION = new ProgressTracker.Step("Step 1. Initialization");
+        private final ProgressTracker.Step RETRIEVING_NOTARY = new ProgressTracker.Step("Step 2. Retrieving the Notary");
+        private final ProgressTracker.Step GENERATING_TRANSACTION = new ProgressTracker.Step("Step 3. Generating transaction");
+        private final ProgressTracker.Step VERIFYING_TRANSACTION = new ProgressTracker.Step("Step 4. Verifying Transaction");
+        private final ProgressTracker.Step SIGNING_TRANSACTION = new ProgressTracker.Step("Step 5. Signing transaction with its private key");
+        private final ProgressTracker.Step COUNTERPARTY_SESSION = new ProgressTracker.Step("Step 6. Sending flow to counterparty");
+        private final ProgressTracker.Step FINALIZING_TRANSACTION = new ProgressTracker.Step("Step 7. Obtaining Notary signature and recording transaction");
 
         private final ProgressTracker progressTracker = new ProgressTracker(
                 INITIALIZATION,
@@ -120,8 +116,8 @@ public class PreciousMetalTransferFlow {
             // Add the iou as an output state, as well as a command to the transaction builder.
             progressTracker.setCurrentStep(GENERATING_TRANSACTION);
             final TransactionBuilder builder = new TransactionBuilder(notary)
-                    .addOutputState(output, PreciousMetalContract.CONTRACT_ID)
                     .addInputState(pmStateAndRef)
+                    .addOutputState(output, PreciousMetalContract.CONTRACT_ID)
                     .addCommand(command);
 
             // Step 4. Verify and sign it with our KeyPair.
@@ -132,7 +128,6 @@ public class PreciousMetalTransferFlow {
             progressTracker.setCurrentStep(SIGNING_TRANSACTION);
             final SignedTransaction ptx = getServiceHub()
                     .signInitialTransaction(builder);
-
             // Step 6. Collect the other party's signature using the SignTransactionFlow.
             progressTracker.setCurrentStep(COUNTERPARTY_SESSION);
             final List<Party> otherParties = output.getParticipants().stream().map(el -> (Party)el).collect(Collectors.toList());

@@ -45,9 +45,11 @@ public class SearchFlow extends FlowLogic<Void> {
                 .getStatesMetadata();
 
         for (Vault.StateStatus vs: vaultStatus) {
-            final List<StateAndRef<PreciousMetalState>> stateAndRef  = getStates(states,
+            System.out.println("_"+vs+"_");
+            final List<StateAndRef<PreciousMetalState>> stateAndRefs  = getStates(states,
                     statesMetadata,
-                    vs);
+                    vs,
+                    true);
         }
         System.out.println("___ Finished Search ___");
         System.out.println("-----------------------------------------------------------------------");
@@ -55,7 +57,8 @@ public class SearchFlow extends FlowLogic<Void> {
 
     public static List<StateAndRef<PreciousMetalState>> getStates(final List<StateAndRef<PreciousMetalState>> states,
                                                             final List<Vault.StateMetadata> statesMetadata,
-                                                            final Vault.StateStatus stateStatus) {
+                                                            final Vault.StateStatus stateStatus,
+                                                            final boolean print) {
 
         final Map<Integer, Vault.StateMetadata> stateMetadataMap = getStateMetadata(statesMetadata, stateStatus);
 
@@ -64,14 +67,16 @@ public class SearchFlow extends FlowLogic<Void> {
             final StateAndRef<PreciousMetalState> stateAndRef = states.get(i);
             stateAndRefs.add(stateAndRef);
             System.out.println("------------------------------ Printing -------------------------------");
-            printStates(stateAndRef);
-            printStateMetadata(statesMetadata.get(i));
+            if (print) {
+                printStates(stateAndRef);
+                printStateMetadata(statesMetadata.get(i));
+            }
         }
         return stateAndRefs;
     }
 
     @NotNull
-    private static Map<Integer, Vault.StateMetadata> getStateMetadata(final List<Vault.StateMetadata> statesMetadata,
+    public static Map<Integer, Vault.StateMetadata> getStateMetadata(final List<Vault.StateMetadata> statesMetadata,
                                                        final Vault.StateStatus stateStatus) {
         System.out.println("Querying with StateStatus: ["+stateStatus.name()+"]");
 
@@ -86,7 +91,7 @@ public class SearchFlow extends FlowLogic<Void> {
         return statesMetadataFound;
     }
 
-    private static void printStates(StateAndRef<PreciousMetalState> stateAndRef) {
+    public static void printStates(StateAndRef<PreciousMetalState> stateAndRef) {
         System.out.println("-------------------------------- State --------------------------------");
         System.out.println("Index: " + stateAndRef.getRef().getIndex());
         System.out.println("Tx-hash: " + stateAndRef.getRef().getTxhash());

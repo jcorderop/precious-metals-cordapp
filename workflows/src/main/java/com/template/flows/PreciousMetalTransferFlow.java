@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.template.flows.SearchFlow.getStates;
+import static com.template.flows.SearchFlow.printStates;
 
 public class PreciousMetalTransferFlow {
 
@@ -159,9 +160,10 @@ public class PreciousMetalTransferFlow {
 
             final List<StateAndRef<PreciousMetalState>> statesUnconsumed  = getStates(states,
                     statesMetadata,
-                    Vault.StateStatus.UNCONSUMED);
+                    Vault.StateStatus.UNCONSUMED,
+                    false);
 
-            return statesUnconsumed
+            StateAndRef<PreciousMetalState> stateAndRefs = statesUnconsumed
                     .stream()
                     .filter(stateAndRef -> stateAndRef
                             .getState()
@@ -170,6 +172,9 @@ public class PreciousMetalTransferFlow {
                             .equals(pmToTransfer))
                     .findFirst()
                     .orElseThrow(() -> new FlowException("Has NO assets to transfer..."));
+
+            printStates(stateAndRefs);
+            return stateAndRefs;
         }
     }
 
